@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 from security import authenticate, identity
 from resources.user import UserRegister
-from resources.delivery import Delivery, DeliveryList
+from resources.delivery import Delivery, DeliveryList, DeliveryStatus
 from resources.delivery_unit import DeliveryUnit, DeliveryUnitList
 from resources.shipper import Shipper, ShipperList
 
@@ -24,10 +24,13 @@ api = Api(app)
 
 jwt = JWT(app, authenticate, identity)      # /auth
 
-# api.add_resource(Store, '/store/<string:name>')
-# api.add_resource(Item, '/item/<string:name>')
-api.add_resource(Delivery, '/delivery/<int:order_id>')
+api.add_resource(DeliveryUnit, '/delivery_units/<int:delivery_unit_id>')
+api.add_resource(DeliveryUnitList, '/delivery_units')
+api.add_resource(Delivery, '/deliveries/<int:order_id>')
 api.add_resource(DeliveryList, '/deliveries')
+api.add_resource(DeliveryStatus, '/deliveries/<int:order_id>/update_status')
+api.add_resource(Shipper, '/shippers/<int:shipper_id>')
+api.add_resource(ShipperList, '/shippers')
 
 api.add_resource(UserRegister, '/register')
 

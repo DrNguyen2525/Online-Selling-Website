@@ -1,18 +1,46 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
+
 from models.shipper import ShipperModel
 
 class Shipper(Resource):
-    def get(self, order_id):
-        shipper = ShipperModel.find_by_order_id(order_id)
+    create_parser = reqparse.RequestParser()
+    create_parser.add_argument('name',
+        type = str,
+        required = True,
+        help = "The field 'name' cannot be left blank."
+    )
+    create_parser.add_argument('phone',
+        type = str,
+        required = True,
+        help = "The field 'phone' cannot be left blank."
+    )
+
+    update_parser = reqparse.RequestParser()
+    update_parser.add_argument('name',
+        type = str,
+        required = True,
+        help = "The field 'name' cannot be left blank."
+    )
+    update_parser.add_argument('phone',
+        type = str,
+        required = True,
+        help = "The field 'phone' cannot be left blank."
+    )
+
+    def get(self, shipper_id):
+        shipper = ShipperModel.find_by_id(shipper_id)
         if shipper:
             return shipper.json()
-        return {'message': 'Shipper not found'}, 404
+        return {'message': 'Shipper not found.'}, 404
 
-    def post(self, order_id):
-        if ShipperModel.find_by_order_id(order_id):
-            return {'message': "A shipper with order_id '{}' already exists.".format(order_id)}, 400
+    def post(self, shipper_id):
+        if ShipperModel.find_by_id(shipper_id):
+            return {'message': "A shipper with shipper_id '{}' already exists.".format(shipper_id)}, 400
 
-        shipper = ShipperModel(order_id)
+        data = Shipper.create_parser.parse_args()
+
+        shipper = ShipperModel(**data)
+
         try:
             shipper.save_to_db()
         except:
@@ -20,28 +48,33 @@ class Shipper(Resource):
 
         return shipper.json()
 
-    # def put(self, order_id):
-    #     data = Shipper.parser.parse_args()
-    #
-    #     shipper = ShipperModel.find_by_order_id(order_id)
-    #
-    #     if shipper is None:
-    #         shipper = ShipperModel(order_id, **data)
-    #     else:
-    #         shipper.price = data['price']
-    #
-    #     shipper.save_to_db()
-    #
-    #     return shipper.json()
+    def put(self, shipper_id):
+        shipper = ShipperModel.find_by_id(shipper_id)
 
-    def delete(self, order_id):
-        shipper = ShipperModel.find_by_order_id(order_id)
+        if shipper:
+            data = Shipper.update_parser.parse_args()
+            shipper.name = data['name']
+            shipper.phone = data['phone']
+        else:
+            data = Shipper.create_parser.parse_args()
+            shipper = ShipperModel(**data)
+
+        try:
+            shipper.save_to_db()
+        except:
+            return {'message': 'An error occurred while updating the shipper.'}, 500
+
+        return shipper.json()
+
+    def delete(self, shipper_id):
+        shipper = ShipperModel.find_by_id(shipper_id)
         if shipper:
             shipper.delete_from_db()
+            return {'message': 'Shipper deleted.'}
 
-        return {'message': 'Shipper deleted.'}
+        return {'message': 'Shipper not found.'}, 404
 
 
 class ShipperList(Resource):
     def get(self):
-        return {'shippers': list(map(lambda x: x.json(), ShipperModel.query.all()))}
+        return {'deliveries': list(map(lambda x: x.json(), ShipperModel.query.all()))}

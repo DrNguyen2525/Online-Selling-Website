@@ -19,8 +19,8 @@ class ShipperModel(db.Model):
         return {'name': self.name, 'phone': self.phone}
 
     @classmethod
-    def find_by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+    def find_by_id(cls, _id):
+        return cls.query.filter_by(id=_id).first()
 
     def save_to_db(self):
         db.session.add(self)
