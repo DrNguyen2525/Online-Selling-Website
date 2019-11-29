@@ -77,4 +77,4 @@ class Shipper(Resource):
 
 class ShipperList(Resource):
     def get(self):
-        return {'deliveries': list(map(lambda x: x.json(), ShipperModel.query.all()))}
+        return {'shippers': list(map(lambda x: x.json(), ShipperModel.query.all()))}
