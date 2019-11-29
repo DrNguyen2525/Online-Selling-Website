@@ -17,7 +17,7 @@ class DeliveryUnitModel(db.Model):
         self.delivery_time = delivery_time
 
     def json(self):
-        return {'name': self.name, 'base_fee': self.base_fee, 'delivery_time': self.delivery_time}
+        return {'id': self.id, 'name': self.name, 'base_fee': self.base_fee, 'delivery_time': self.delivery_time}
 
     @classmethod
     def find_by_id(cls, _id):

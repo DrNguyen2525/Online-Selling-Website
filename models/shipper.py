@@ -16,7 +16,7 @@ class ShipperModel(db.Model):
         self.phone = phone
 
     def json(self):
-        return {'name': self.name, 'phone': self.phone}
+        return {'id': self.id, 'name': self.name, 'phone': self.phone}
 
     @classmethod
     def find_by_id(cls, _id):
