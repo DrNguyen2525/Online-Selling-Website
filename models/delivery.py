@@ -1,7 +1,5 @@
 from db import db
 
-import json
-
 class DeliveryModel(db.Model):
     __tablename__ = 'deliveries'
 
@@ -9,7 +7,7 @@ class DeliveryModel(db.Model):
     receiver_phone = db.Column(db.String(25))
     total_cost = db.Column(db.Integer)
     expected_receving_date = db.Column(db.DateTime)
-    status = db.Column(db.Integer)
+    status = db.Column(db.String(10))
 
     order_id = db.Column(db.Integer, primary_key=True)
     shipper_id = db.Column(db.Integer, db.ForeignKey('shippers.id', onupdate="CASCADE", ondelete="SET NULL"))

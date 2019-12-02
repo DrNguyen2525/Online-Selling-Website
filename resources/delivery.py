@@ -36,7 +36,7 @@ class Delivery(Resource):
         help = "The field 'shipper_id' cannot be left blank."
     )
     update_parser.add_argument('status',
-        type = int,
+        type = str,
         required = True,
         help = "The field 'status' cannot be left blank."
     )
