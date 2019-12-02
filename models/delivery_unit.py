@@ -24,8 +24,8 @@ class DeliveryUnitModel(db.Model):
         return cls.query.filter_by(id=_id).first()
 
     @classmethod
-    def count_by_id(cls):
-        return cls.query.count()
+    def get_id_list(cls):
+        return [value for value, in db.session.query(DeliveryUnitModel.id).all()]
 
     def save_to_db(self):
         db.session.add(self)

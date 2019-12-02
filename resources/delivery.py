@@ -58,7 +58,7 @@ class Delivery(Resource):
             if delivery_unit is None:
                 return {'message': 'Delivery unit not found', 'success': 'false'}, 400
         else:
-            delivery_unit = DeliveryUnitModel.find_by_id(random.randint(1, DeliveryUnitModel.count_by_id()))
+            delivery_unit = DeliveryUnitModel.find_by_id(random.choice(DeliveryUnitModel.get_id_list()))
             data['delivery_unit_id'] = delivery_unit.id
 
         expected_receving_date = datetime.today() + timedelta(days=delivery_unit.delivery_time)
@@ -76,7 +76,7 @@ class Delivery(Resource):
         delivery = DeliveryModel.find_by_order_id(order_id)
 
         if delivery:
-            if delivery.status == 0:
+            if delivery.status == 'pending':
                 data = Delivery.create_parser.parse_args()
                 delivery.receiving_address = data['receiving_address']
                 delivery.receiver_phone = data['receiver_phone']
@@ -90,7 +90,7 @@ class Delivery(Resource):
                 if delivery_unit is None:
                     return {'message': 'Delivery unit not found', 'success': 'false'}, 400
             else:
-                delivery_unit = DeliveryUnitModel.find_by_id(random.randint(1, DeliveryUnitModel.count_by_id()))
+                delivery_unit = DeliveryUnitModel.find_by_id(random.choice(DeliveryUnitModel.get_id_list()))
                 data['delivery_unit_id'] = delivery_unit.id
 
             expected_receving_date = datetime.today() + timedelta(days=delivery_unit.delivery_time)
