@@ -22,10 +22,10 @@ class DeliveryModel(db.Model):
         self.receiver_phone = receiver_phone
         self.total_cost = total_cost
         self.delivery_unit_id = delivery_unit_id
-        self.status = 0
+        self.status = "pending"
 
     def json(self):
-        return {'order_id': self.order_id, 'delivery_unit_id': self.delivery_unit_id, 'shipper_id': self.shipper_id, 'receiving_address': self.receiving_address, 'receiver_phone': self.receiver_phone, 'total_cost': self.total_cost, 'expected_receving_date': json.dumps(self.expected_receving_date, default=str), 'status': self.status, 'success': 'true'}
+        return {'order_id': self.order_id, 'delivery_unit_id': self.delivery_unit_id, 'shipper_id': self.shipper_id, 'receiving_address': self.receiving_address, 'receiver_phone': self.receiver_phone, 'total_cost': self.total_cost, 'expected_receving_date': self.expected_receving_date.strftime("%Y-%m-%d"), 'status': self.status, 'success': 'true'}
 
     @classmethod
     def find_by_order_id(cls, order_id):
