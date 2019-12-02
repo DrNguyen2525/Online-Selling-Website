@@ -63,7 +63,7 @@ class Delivery(Resource):
 
         expected_receving_date = datetime.today() + timedelta(days=delivery_unit.delivery_time)
 
-        delivery = DeliveryModel(order_id, expected_receving_date, **data)
+        delivery = DeliveryModel(order_id, expected_receving_date, datetime.today(), datetime.today(), **data)
 
         try:
             delivery.save_to_db()
@@ -76,10 +76,11 @@ class Delivery(Resource):
         delivery = DeliveryModel.find_by_order_id(order_id)
 
         if delivery:
-            if delivery.status == 'pending':
+            if delivery.status == 'Pending':
                 data = Delivery.create_parser.parse_args()
                 delivery.receiving_address = data['receiving_address']
                 delivery.receiver_phone = data['receiver_phone']
+                delivery.updated_at = datetime.today()
             else:
                 return {'message': 'Can not modify the delivery at this time.', 'success': 'false'}, 400
         else:
@@ -95,7 +96,7 @@ class Delivery(Resource):
 
             expected_receving_date = datetime.today() + timedelta(days=delivery_unit.delivery_time)
 
-            delivery = DeliveryModel(order_id, expected_receving_date, **data)
+            delivery = DeliveryModel(order_id, expected_receving_date, datetime.today(), datetime.today(), **data)
 
         try:
             delivery.save_to_db()
@@ -126,6 +127,7 @@ class DeliveryStatus(Resource):
             data = Delivery.update_parser.parse_args()
             delivery.shipper_id = data['shipper_id']
             delivery.status = data['status']
+            delivery.updated_at = datetime.today()
             try:
                 delivery.save_to_db()
             except:
