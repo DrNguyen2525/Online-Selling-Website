@@ -33,21 +33,6 @@ class Shipper(Resource):
             return shipper.json()
         return {'message': 'Shipper not found.'}, 404
 
-    def post(self, shipper_id):
-        if ShipperModel.find_by_id(shipper_id):
-            return {'message': "A shipper with shipper_id '{}' already exists.".format(shipper_id)}, 400
-
-        data = Shipper.create_parser.parse_args()
-
-        shipper = ShipperModel(**data)
-
-        try:
-            shipper.save_to_db()
-        except:
-            return {'message': 'An error occurred while creating the shipper.'}, 500
-
-        return shipper.json()
-
     def put(self, shipper_id):
         shipper = ShipperModel.find_by_id(shipper_id)
 
@@ -78,3 +63,15 @@ class Shipper(Resource):
 class ShipperList(Resource):
     def get(self):
         return {'shippers': list(map(lambda x: x.json(), ShipperModel.query.all()))}
+
+    def post(self):
+        data = Shipper.create_parser.parse_args()
+
+        shipper = ShipperModel(**data)
+
+        try:
+            shipper.save_to_db()
+        except:
+            return {'message': 'An error occurred while creating the shipper.'}, 500
+
+        return shipper.json()
