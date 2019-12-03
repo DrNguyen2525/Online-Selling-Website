@@ -135,4 +135,4 @@ class DeliveryStatus(Resource):
 
             return delivery.json()
 
-        return {'message': 'Delivery unit not found', 'success': 'false'}, 400
+        return {'message': 'Delivery unit not found', 'success': 'false'}, 404
