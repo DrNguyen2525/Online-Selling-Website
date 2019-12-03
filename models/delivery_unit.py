@@ -5,7 +5,7 @@ class DeliveryUnitModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    base_fee = db.Column(db.Integer)
+    base_fee = db.Column(db.Float)
     delivery_time = db.Column(db.Integer)
 
     shippers = db.relationship('ShipperModel', lazy='dynamic')
