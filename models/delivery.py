@@ -5,7 +5,7 @@ class DeliveryModel(db.Model):
 
     receiving_address = db.Column(db.String(200))
     receiver_phone = db.Column(db.String(25))
-    total_cost = db.Column(db.Integer)
+    total_cost = db.Column(db.Float)
     expected_receving_date = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
