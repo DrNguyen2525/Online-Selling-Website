@@ -28,7 +28,7 @@ api.add_resource(DeliveryUnit, '/delivery_units/<int:delivery_unit_id>')
 api.add_resource(DeliveryUnitList, '/delivery_units')
 api.add_resource(Delivery, '/deliveries/<int:order_id>')
 api.add_resource(DeliveryList, '/deliveries')
-api.add_resource(DeliveryStatus, '/deliveries/<int:order_id>/update_status')
+api.add_resource(DeliveryStatus, '/deliveries/<int:order_id>/status')
 api.add_resource(Shipper, '/shippers/<int:shipper_id>')
 api.add_resource(ShipperList, '/shippers')
 
