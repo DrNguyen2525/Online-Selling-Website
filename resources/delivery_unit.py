@@ -7,35 +7,19 @@ class DeliveryUnit(Resource):
     create_parser.add_argument('name',
         type = str,
         required = True,
-        help = "The field 'name' cannot be left blank."
     )
     create_parser.add_argument('base_fee',
-        type = int,
+        type = float,
         required = True,
-        help = "The field 'base_fee' cannot be left blank."
+        help = "This field cannot be left blank and must be a float number"
     )
     create_parser.add_argument('delivery_time',
         type = int,
         required = True,
-        help = "The field 'delivery_time' cannot be left blank."
+        help = "This field cannot be left blank and must be an integer"
     )
 
-    update_parser = reqparse.RequestParser()
-    update_parser.add_argument('name',
-        type = str,
-        required = True,
-        help = "The field 'name' cannot be left blank."
-    )
-    update_parser.add_argument('base_fee',
-        type = int,
-        required = True,
-        help = "The field 'base_fee' cannot be left blank."
-    )
-    update_parser.add_argument('delivery_time',
-        type = int,
-        required = True,
-        help = "The field 'delivery_time' cannot be left blank."
-    )
+    update_parser = create_parser.copy()
 
     def get(self, delivery_unit_id):
         delivery_unit = DeliveryUnitModel.find_by_id(delivery_unit_id)
@@ -53,6 +37,10 @@ class DeliveryUnit(Resource):
             delivery_unit.delivery_time = data['delivery_time']
         else:
             data = DeliveryUnit.create_parser.parse_args()
+
+            if DeliveryUnitModel.find_by_name(data['name']):
+                return {'message': "A delivery unit with name '{}' already exists.".format(data['name'])}, 400
+
             delivery_unit = DeliveryUnitModel(**data)
 
         try:

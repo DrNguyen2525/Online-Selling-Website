@@ -14,8 +14,9 @@ from resources.shipper import Shipper, ShipperList
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'SP10'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['BUNDLE_ERRORS'] = True
+app.secret_key = os.urandom(16)
 api = Api(app)
 
 # @app.before_first_request

@@ -11,34 +11,33 @@ class Delivery(Resource):
     create_parser.add_argument('receiving_address',
         type = str,
         required = True,
-        help = "The field 'receiving_address' cannot be left blank."
     )
     create_parser.add_argument('receiver_phone',
         type = str,
         required = True,
-        help = "The field 'receiver_phone' cannot be left blank."
     )
     create_parser.add_argument('total_cost',
-        type = int,
+        type = float,
         required = True,
-        help = "The field 'total_cost' cannot be left blank."
+        help = "This field cannot be left blank and must be a float number"
     )
     create_parser.add_argument('delivery_unit_id',
         type = int,
         required = False,
-        help = "The field 'delivery_unit_id' must be an integer."
+        help = "This field must be an integer"
     )
 
     update_parser = reqparse.RequestParser()
     update_parser.add_argument('shipper_id',
         type = int,
         required = True,
-        help = "The field 'shipper_id' cannot be left blank."
+        help = "This field cannot be left blank and must be an integer"
     )
     update_parser.add_argument('status',
         type = str,
         required = True,
-        help = "The field 'status' cannot be left blank."
+        choices = ('Pending', 'Confirmed', 'Shipping', 'Shipped'),
+        help = "{error_msg}. Only 'Pending', 'Confirmed', 'Shipping', 'Shipped' are available"
     )
 
     def get(self, order_id):
