@@ -11,12 +11,13 @@ class ShipperModel(db.Model):
     delivery_unit = db.relationship('DeliveryUnitModel')
     deliveries = db.relationship('DeliveryModel', lazy='dynamic')
 
-    def __init__(self, name, phone):
+    def __init__(self, name, phone, delivery_unit_id):
         self.name = name
         self.phone = phone
+        self.delivery_unit_id = delivery_unit_id
 
     def json(self):
-        return {'id': self.id, 'name': self.name, 'phone': self.phone}
+        return {'id': self.id, 'name': self.name, 'phone': self.phone, 'delivery_unit_id': self.delivery_unit_id}
 
     @classmethod
     def find_by_id(cls, _id):
