@@ -78,6 +78,9 @@ class DeliveryUnitList(Resource):
     def post(self):
         data = DeliveryUnit.create_parser.parse_args()
 
+        if DeliveryUnitModel.find_by_name(data['name']):
+            return {'message': "A delivery unit with name '{}' already exists.".format(data['name'])}, 400
+
         delivery_unit = DeliveryUnitModel(**data)
 
         try:
