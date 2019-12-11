@@ -36,8 +36,8 @@ class Delivery(Resource):
     update_parser.add_argument('status',
         type = str,
         required = True,
-        choices = ('Pending', 'Confirmed', 'Shipping', 'Shipped'),
-        help = "{error_msg}. Only 'Pending', 'Confirmed', 'Shipping', 'Shipped' are available"
+        choices = ('Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled'),
+        help = "{error_msg}. Only 'Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled' are available"
     )
 
     def get(self, order_id):
