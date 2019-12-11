@@ -100,7 +100,7 @@ class Delivery(Resource):
         try:
             delivery.save_to_db()
         except:
-            return {'message': 'An error occurred while updating the delivery.', 'success': 'false', 'success': 'false'}, 500
+            return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
 
         return delivery.json()
 
