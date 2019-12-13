@@ -1,11 +1,15 @@
 import random
+import requests
 
 from flask_restful import Resource, reqparse
 from datetime import datetime, timedelta
+from requests.exceptions import HTTPError
 
 from models.delivery import DeliveryModel
 from models.delivery_unit import DeliveryUnitModel
 from models.shipper import ShipperModel
+
+from service_explorer import order_service
 
 class Delivery(Resource):
     create_parser = reqparse.RequestParser()
@@ -77,22 +81,26 @@ class Delivery(Resource):
     def put(self, order_id):
         delivery = DeliveryModel.find_by_order_id(order_id)
 
+        data = Delivery.create_parser.parse_args()
+
+        if data['delivery_unit_id']:
+            delivery_unit = DeliveryUnitModel.find_by_id(data['delivery_unit_id'])
+            if delivery_unit is None:
+                return {'message': 'Delivery unit not found', 'success': 'false'}, 400
+
         if delivery:
             if delivery.status == 'Pending':
-                data = Delivery.create_parser.parse_args()
                 delivery.receiving_address = data['receiving_address']
                 delivery.receiver_phone = data['receiver_phone']
+                delivery.total_cost = data['total_cost']
+                if data['delivery_unit_id'] and data['delivery_unit_id'] != delivery.delivery_unit_id:
+                    delivery.delivery_unit_id = data['delivery_unit_id']
+                    delivery.expected_receving_date = datetime.today() + timedelta(days=delivery_unit.delivery_time)
                 delivery.updated_at = datetime.today()
             else:
                 return {'message': 'Can not modify the delivery at this time.', 'success': 'false'}, 400
         else:
-            data = Delivery.create_parser.parse_args()
-
-            if data['delivery_unit_id'] or data['delivery_unit_id'] is not None:
-                delivery_unit = DeliveryUnitModel.find_by_id(data['delivery_unit_id'])
-                if delivery_unit is None:
-                    return {'message': 'Delivery unit not found', 'success': 'false'}, 400
-            else:
+            if data['delivery_unit_id'] is None:
                 delivery_unit = DeliveryUnitModel.find_by_id(random.choice(DeliveryUnitModel.get_id_list()))
                 data['delivery_unit_id'] = delivery_unit.id
 
@@ -121,13 +129,45 @@ class DeliveryList(Resource):
         return {'deliveries': list(map(lambda x: x.json(), DeliveryModel.query.all()))}
 
 
+class DeliveryShipper(Resource):
+    def patch(self, order_id):
+        delivery = DeliveryModel.find_by_order_id(order_id)
+
+        if delivery:
+            data = Delivery.shipper_update_parser.parse_args()
+
+            if data['shipper_id']:
+                shipper = ShipperModel.find_by_id(data['shipper_id'])
+
+                if shipper:
+                    if shipper.delivery_unit_id == delivery.delivery_unit_id:
+                        shipper_id = data['shipper_id']
+                    else:
+                        return {'message': 'Can not assign this shipper to ship this delivery. Delivery unit not match.'}, 400
+                else:
+                    return {'message': 'Shipper not found'}, 400
+
+            else:
+                delivery_unit = DeliveryUnitModel.find_by_id(delivery.delivery_unit_id)
+                shipper_id = random.choice(delivery_unit.get_shipper_id_list())
+
+            delivery.shipper_id = shipper_id
+            delivery.updated_at = datetime.today()
+            try:
+                delivery.save_to_db()
+            except:
+                return {'message': 'An error occurred while updating the delivery.'}, 500
+            return delivery.json()
+
+        return {'message': 'Delivery not found'}, 404
+
+
 class DeliveryStatus(Resource):
     def patch(self, order_id):
         delivery = DeliveryModel.find_by_order_id(order_id)
 
         if delivery:
-            data = Delivery.update_parser.parse_args()
-            delivery.shipper_id = data['shipper_id']
+            data = Delivery.status_update_parser.parse_args()
             delivery.status = data['status']
             delivery.updated_at = datetime.today()
             try:
@@ -135,6 +175,52 @@ class DeliveryStatus(Resource):
             except:
                 return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
 
+            try:
+                response = requests.put(
+                    order_service + '/api/order/' + str(order_id),
+                    params={'deliveryStatus': str(delivery.status)}
+                )
+                # If the response was successful, no Exception will be raised
+                response.raise_for_status()
+            except HTTPError as http_err:
+                print(f'HTTP error occurred: {http_err}.')  # Python 3.6
+                return response.json(), response.status_code
+            except Exception as err:
+                print(f'Other error occurred: {err}.')  # Python 3.6
+            else:
+                print('Delivery status updated successfully.')
+
+            try:
+                response = requests.get(order_service + '/api/order/' + str(order_id))
+                response.raise_for_status()
+            except HTTPError as http_err:
+                print(f'HTTP error occurred: {http_err}.')
+                return response.json(), response.status_code
+            except Exception as err:
+                print(f'Other error occurred: {err}.')
+                return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
+            else:
+                if response.json()['payment']['type'] == 'COD':
+                    switcher = {
+                        'Shipped': 'Success',
+                        'Canceled': 'Canceled'
+                    }
+
+                    try:
+                        response = requests.put(
+                            order_service + '/api/order/' + str(order_id),
+                            params={'paymentStatus': switcher.get(data['status'], 'Pending')}
+                        )
+                        response.raise_for_status()
+                    except HTTPError as http_err:
+                        print(f'HTTP error occurred: {http_err}.')
+                        return response.json(), response.status_code
+                    except Exception as err:
+                        print(f'Other error occurred: {err}.')
+                        return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
+                    else:
+                        print('Payment status updated successfully.')
+
             return delivery.json()
 
-        return {'message': 'Delivery unit not found', 'success': 'false'}, 404
+        return {'message': 'Delivery not found', 'success': 'false'}, 404
