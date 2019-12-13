@@ -5,39 +5,42 @@ from datetime import datetime, timedelta
 
 from models.delivery import DeliveryModel
 from models.delivery_unit import DeliveryUnitModel
+from models.shipper import ShipperModel
 
 class Delivery(Resource):
     create_parser = reqparse.RequestParser()
     create_parser.add_argument('receiving_address',
-        type = str,
-        required = True,
-    )
+                               type=str,
+                               required=True,
+                               )
     create_parser.add_argument('receiver_phone',
-        type = str,
-        required = True,
-    )
+                               type=str,
+                               required=True,
+                               )
     create_parser.add_argument('total_cost',
-        type = float,
-        required = True,
-        help = "This field cannot be left blank and must be a float number"
-    )
+                               type=float,
+                               required=True,
+                               help="This field cannot be left blank and must be a float number"
+                               )
     create_parser.add_argument('delivery_unit_id',
-        type = int,
-        required = False,
-        help = "This field must be an integer"
-    )
+                               type=int,
+                               required=False,
+                               help="This field must be an integer"
+                               )
 
-    update_parser = reqparse.RequestParser()
-    update_parser.add_argument('shipper_id',
-        type = int,
-        required = True,
-        help = "This field cannot be left blank and must be an integer"
-    )
-    update_parser.add_argument('status',
-        type = str,
-        required = True,
-        choices = ('Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled'),
-        help = "{error_msg}. Only 'Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled' are available"
+    shipper_update_parser = reqparse.RequestParser()
+    shipper_update_parser.add_argument('shipper_id',
+                                       type=int,
+                                       required=False,
+                                       help="This field cannot be left blank and must be an integer"
+                                       )
+
+    status_update_parser = reqparse.RequestParser()
+    status_update_parser.add_argument('status',
+                                      type=str,
+                                      required=True,
+                                      choices=('Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled'),
+                                      help="{error_msg}. Only 'Pending', 'Confirmed', 'Shipping', 'Shipped', 'Canceled' are available"
     )
 
     def get(self, order_id):

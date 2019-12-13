@@ -1,5 +1,7 @@
 from db import db
 
+from models.shipper import ShipperModel
+
 class DeliveryUnitModel(db.Model):
     __tablename__ = 'delivery_units'
 
@@ -30,6 +32,9 @@ class DeliveryUnitModel(db.Model):
     @classmethod
     def get_id_list(cls):
         return [value for value, in db.session.query(DeliveryUnitModel.id).all()]
+
+    def get_shipper_id_list(self):
+        return [value for value, in db.session.query(ShipperModel.id).filter_by(delivery_unit_id=self.id).all()]
 
     def save_to_db(self):
         db.session.add(self)
