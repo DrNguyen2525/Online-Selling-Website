@@ -39,7 +39,7 @@ class DeliveryUnit(Resource):
             data = DeliveryUnit.create_parser.parse_args()
 
             if DeliveryUnitModel.find_by_name(data['name']):
-                return {'message': "A delivery unit with name '{}' already exists.".format(data['name'])}, 400
+                return {'message': f'A delivery unit with name {data['name']} already exists.'}, 400
 
             delivery_unit = DeliveryUnitModel(**data)
 

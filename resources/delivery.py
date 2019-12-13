@@ -51,7 +51,7 @@ class Delivery(Resource):
 
     def post(self, order_id):
         if DeliveryModel.find_by_order_id(order_id):
-            return {'message': "A delivery with order_id '{}' already exists.".format(order_id), 'success': 'false'}, 400
+            return {'message': f'A delivery with order_id {order_id} already exists.', 'success': 'false'}, 400
 
         data = Delivery.create_parser.parse_args()
 
