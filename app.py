@@ -3,14 +3,16 @@ import os
 from flask import Flask, session, render_template, request, redirect, g, url_for
 from flask_restful import Api
 from flask_cors import CORS
+import requests
 
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.delivery import Delivery, DeliveryList, DeliveryShipper, DeliveryStatus
 from resources.delivery_unit import DeliveryUnit, DeliveryUnitList
 from resources.shipper import Shipper, ShipperList
+from requests.exceptions import HTTPError
 
-from service_explorer import account_service, delivery_service
+from service_explorer import account_service, delivery_service, order_service
 
 app = Flask(__name__)
 CORS(app)
@@ -71,7 +73,21 @@ def dropsession():
     session.pop('user', None)
     return 'Session destroyed.'
 
+@app.route('/sp04_test/<order_id>', methods=['GET'])
+def get_order_details(order_id):
+    try:
+        response = requests.get(order_service + '/api/order/' + order_id)
+        response.raise_for_status()
+    except HTTPError as http_err:
+        print(f'HTTP error occurred: {http_err}.')
+        return response.json(), response.status_code
+    except Exception as err:
+        print(f'Other error occurred: {err}.')
+        return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
+    else:
+        return response.json(), response.status_code
+
 if __name__ == '__main__':
     from db import db
     db.init_app(app)
-    app.run(port=5000, debug=False)
+    app.run(port=5000, debug=True)
