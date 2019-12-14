@@ -75,19 +75,10 @@ def dropsession():
 
 @app.route('/sp04_test/<order_id>', methods=['GET'])
 def get_order_details(order_id):
-    try:
-        response = requests.get(order_service + '/api/order/' + order_id)
-        response.raise_for_status()
-    except HTTPError as http_err:
-        print(f'HTTP error occurred: {http_err}.')
-        return response.json(), response.status_code
-    except Exception as err:
-        print(f'Other error occurred: {err}.')
-        return {'message': 'An error occurred while updating the delivery.', 'success': 'false'}, 500
-    else:
-        return response.json(), response.status_code
+    response = requests.get(order_service + '/api/order/' + order_id)
+    return response.json(), response.status_code
 
 if __name__ == '__main__':
     from db import db
     db.init_app(app)
-    app.run(port=5000, debug=True)
+    app.run(port=5000, debug=False)
