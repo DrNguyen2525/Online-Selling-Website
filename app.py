@@ -73,11 +73,6 @@ def dropsession():
     session.pop('user', None)
     return 'Session destroyed.'
 
-@app.route('/sp04_test/<order_id>', methods=['GET'])
-def get_order_details(order_id):
-    response = requests.get(order_service + '/api/order/' + order_id)
-    return response.json(), response.status_code
-
 if __name__ == '__main__':
     from db import db
     db.init_app(app)
