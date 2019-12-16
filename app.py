@@ -45,12 +45,12 @@ def index():
             response.raise_for_status()
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}.')
-            return response.text, response.status_code
+            return response.json(), response.status_code
         except Exception as err:
             print(f'Other error occurred: {err}.')
             return {'message': 'An error occurred.'}, 500
         else:
-            if response.text == 'yes':
+            if response.json() == 'yes':
                 return redirect(delivery_frontend)
 
     return redirect(account_service + '/requirelogin?url=' + delivery_service)
