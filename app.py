@@ -1,8 +1,10 @@
 import os
+import requests
 
 from flask import Flask, session, render_template, request, redirect, g, url_for
 from flask_restful import Api
 from flask_cors import CORS
+from requests.exceptions import HTTPError
 
 from security import authenticate, identity
 from resources.user import UserRegister
@@ -37,18 +39,25 @@ api.add_resource(UserRegister, '/register')
 
 @app.route('/')
 def index():
-    return redirect(account_service + "/requirelogin" + "?url=" + delivery_service)
+    if g.user_id and g.session_id:
+        try:
+            response = requests.get(account_service + '/api/getsession/' + g.session_id)
+            response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'HTTP error occurred: {http_err}.')
+            return response.text, response.status_code
+        except Exception as err:
+            print(f'Other error occurred: {err}.')
+            return {'message': 'An error occurred.'}, 500
+        else:
+            if response.text == 'yes':
+                return redirect(delivery_frontend)
 
-@app.route('/protected')
-def protected():
-    if g.user_id:
-        return render_template('protected.html')
-
-    return redirect(account_service + "/requirelogin" + "?url=" + delivery_service)
+    return redirect(account_service + '/requirelogin?url=' + delivery_service)
 
 @app.route('/logout')
 def logout():
-    return redirect(account_service + "/logout" + "?url=" + delivery_service)
+    return redirect(account_service + '/logout?url=' + delivery_service)
 
 @app.before_request
 def before_request():
@@ -67,15 +76,15 @@ def setsession():
 @app.route('/getsession')
 def getsession():
     if 'user_id' in session and 'session_id' in session:
-        return session['user_id'] + session['session_id']
+        return {'user_id': '{}'.format(session['user_id']), 'session_id': '{}'.format(session['session_id'])}
 
-    return 'Not logged in !'
+    return {'message': 'Not logged in.'}
 
 @app.route('/destroysession')
 def dropsession():
     session.pop('user_id', None)
     session.pop('session_id', None)
-    return 'Session destroyed.'
+    return {'message': 'Session destroyed.'}
 
 if __name__ == '__main__':
     from db import db
