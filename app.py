@@ -35,40 +35,46 @@ api.add_resource(ShipperList, '/shippers')
 
 api.add_resource(UserRegister, '/register')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        session.pop('user', None)
-
-        if request.form['password'] == 'password':
-            session['user'] = request.form['username']
-            return redirect(url_for('protected'))
-
-    return render_template('index.html')
+    return redirect(account_service + "/requirelogin" + "?url=" + delivery_service)
 
 @app.route('/protected')
 def protected():
-    if g.user:
+    if g.user_id:
         return render_template('protected.html')
 
     return redirect(account_service + "/requirelogin" + "?url=" + delivery_service)
 
+@app.route('/logout')
+def logout():
+    return redirect(account_service + "/logout" + "?url=" + delivery_service)
+
 @app.before_request
 def before_request():
-    g.user = None
-    if 'user' in session:
-        g.user = session['user']
+    g.user_id = None
+    g.session_id = None
+    if 'user_id' in session and 'session_id' in session:
+        g.user_id = session['user_id']
+        g.session_id = session['session_id']
+
+@app.route('/setsession')
+def setsession():
+    session['user_id'] = request.args.get('user_id')
+    session['session_id'] = request.args.get('session_id')
+    return redirect(url_for('protected'))
 
 @app.route('/getsession')
 def getsession():
-    if 'user' in session:
-        return session['user']
+    if 'user_id' in session and 'session_id' in session:
+        return session['user_id'] + session['session_id']
 
     return 'Not logged in !'
 
 @app.route('/destroysession')
 def dropsession():
-    session.pop('user', None)
+    session.pop('user_id', None)
+    session.pop('session_id', None)
     return 'Session destroyed.'
 
 if __name__ == '__main__':
