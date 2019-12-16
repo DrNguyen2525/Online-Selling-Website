@@ -3,14 +3,12 @@ import os
 from flask import Flask, session, render_template, request, redirect, g, url_for
 from flask_restful import Api
 from flask_cors import CORS
-import requests
 
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.delivery import Delivery, DeliveryList, DeliveryShipper, DeliveryStatus
 from resources.delivery_unit import DeliveryUnit, DeliveryUnitList
 from resources.shipper import Shipper, ShipperList
-from requests.exceptions import HTTPError
 
 from service_explorer import account_service, delivery_service, order_service
 
