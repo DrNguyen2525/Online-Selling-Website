@@ -10,7 +10,7 @@ from resources.delivery import Delivery, DeliveryList, DeliveryShipper, Delivery
 from resources.delivery_unit import DeliveryUnit, DeliveryUnitList
 from resources.shipper import Shipper, ShipperList
 
-from service_explorer import account_service, delivery_service, order_service
+from service_explorer import account_service, delivery_service, delivery_frontend
 
 app = Flask(__name__)
 CORS(app)
@@ -62,7 +62,7 @@ def before_request():
 def setsession():
     session['user_id'] = request.args.get('user_id')
     session['session_id'] = request.args.get('session_id')
-    return redirect(url_for('protected'))
+    return redirect(delivery_frontend)
 
 @app.route('/getsession')
 def getsession():
