@@ -169,6 +169,9 @@ class DeliveryStatus(Resource):
         if delivery:
             data = Delivery.status_update_parser.parse_args()
             delivery.status = data['status']
+            if data['status'] == 'Shipping' and delivery.shipper is None:
+                delivery_unit = DeliveryUnitModel.find_by_id(delivery.delivery_unit_id)
+                delivery.shipper_id = random.choice(delivery_unit.get_shipper_id_list())
             delivery.updated_at = datetime.today()
             try:
                 delivery.save_to_db()
