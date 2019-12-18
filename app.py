@@ -88,7 +88,7 @@ def getsession():
 def dropsession():
     session.pop('user_id', None)
     session.pop('session_id', None)
-    return {'message': 'Session destroyed.'}
+    return redirect(account_service)
 
 if __name__ == '__main__':
     from db import db
