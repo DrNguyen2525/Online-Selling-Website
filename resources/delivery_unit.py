@@ -77,3 +77,21 @@ class DeliveryUnitList(Resource):
             return {'message': 'An error occurred while creating the delivery unit.'}, 500
 
         return delivery_unit.json()
+
+
+class DeliveryUnitShipper(Resource):
+    def get(self, delivery_unit_id):
+        delivery_unit = DeliveryUnitModel.find_by_id(delivery_unit_id)
+        if delivery_unit:
+            return delivery_unit.get_shipper_list()
+
+        return {'message': 'Delivery unit not found.'}, 404
+
+
+class DeliveryUnitDelivery(Resource):
+    def get(self, delivery_unit_id):
+        delivery_unit = DeliveryUnitModel.find_by_id(delivery_unit_id)
+        if delivery_unit:
+            return delivery_unit.get_delivery_list()
+
+        return {'message': 'Delivery unit not found.'}, 404

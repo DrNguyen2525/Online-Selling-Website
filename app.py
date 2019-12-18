@@ -9,7 +9,7 @@ from requests.exceptions import HTTPError
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.delivery import Delivery, DeliveryList, DeliveryShipper, DeliveryStatus
-from resources.delivery_unit import DeliveryUnit, DeliveryUnitList
+from resources.delivery_unit import DeliveryUnit, DeliveryUnitList, DeliveryUnitShipper, DeliveryUnitDelivery
 from resources.shipper import Shipper, ShipperList
 
 from service_explorer import account_service, delivery_service, delivery_frontend
@@ -28,10 +28,14 @@ api = Api(app)
 
 api.add_resource(DeliveryUnit, '/delivery_units/<int:delivery_unit_id>')
 api.add_resource(DeliveryUnitList, '/delivery_units')
+api.add_resource(DeliveryUnitShipper, '/delivery_units/<int:delivery_unit_id>/shippers')
+api.add_resource(DeliveryUnitDelivery, '/delivery_units/<int:delivery_unit_id>/deliveries')
+
 api.add_resource(Delivery, '/deliveries/<int:order_id>')
 api.add_resource(DeliveryList, '/deliveries')
 api.add_resource(DeliveryShipper, '/deliveries/<int:order_id>/shipper')
 api.add_resource(DeliveryStatus, '/deliveries/<int:order_id>/status')
+
 api.add_resource(Shipper, '/shippers/<int:shipper_id>')
 api.add_resource(ShipperList, '/shippers')
 

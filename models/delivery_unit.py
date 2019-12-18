@@ -36,6 +36,12 @@ class DeliveryUnitModel(db.Model):
     def get_shipper_id_list(self):
         return [value for value, in db.session.query(ShipperModel.id).filter_by(delivery_unit_id=self.id).all()]
 
+    def get_shipper_list(self):
+        return {'shippers': [shipper.json() for shipper in self.shippers.all()]}
+
+    def get_delivery_list(self):
+        return {'deliveries': [delivery.json() for delivery in self.deliveries.all()]}
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
